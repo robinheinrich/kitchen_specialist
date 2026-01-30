@@ -1,5 +1,5 @@
 name: "Kitchen Manager"
-version: "0.0.1"
+version: "0.0.2"
 slug: "kitchen_manager"
 description: "Modern Kitchen Management: Shopping, Inventory, Recipes"
 url: "https://github.com/robinheinrich/kitchen_manager"
@@ -10,6 +10,13 @@ arch:
   - armhf
   - armv7
   - i386
+build_from:
+  amd64: ghcr.io/home-assistant/amd64-base:3.19
+  aarch64: ghcr.io/home-assistant/aarch64-base:3.19
+  armv7: ghcr.io/home-assistant/armv7-base:3.19
+  armhf: ghcr.io/home-assistant/armhf-base:3.19
+  i386: ghcr.io/home-assistant/i386-base:3.19
+init: false
 map:
   - "config:rw"
   - "share:rw"
