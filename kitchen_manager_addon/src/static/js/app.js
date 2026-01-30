@@ -155,11 +155,25 @@ function setupModal() {
         const defaultTab = document.getElementById('default-tab-select').value;
         await api.post('/settings', { default_tab: defaultTab });
         closeModal('settings-modal');
-        alert('Einstellungen gespeichert');
+        // No alert requested
     });
 }
 
+function updateTitle() {
+    const subtitles = {
+        'shopping': '- Einkauf',
+        'inventory': '- Bestand',
+        'recipes': '- Rezepte',
+        'templates': '- Vorlagen'
+    };
+    const subtitleEl = document.getElementById('header-subtitle');
+    if (subtitleEl) {
+        subtitleEl.textContent = subtitles[state.currentTab] || '';
+    }
+}
+
 async function render() {
+    updateTitle(); // Update title on render/switch
     const main = document.getElementById('main-content');
     main.innerHTML = '<div style="text-align: center; padding: 20px;">Laden...</div>';
 
