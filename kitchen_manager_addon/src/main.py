@@ -18,6 +18,13 @@ app = FastAPI()
 # Database setup
 db_manager = DatabaseManager()
 
+@app.middleware("http")
+async def normalize_slashes(request: Request, call_next):
+    # Fix for Home Assistant Ingress sending "//" instead of "/"
+    if request.url.path == "//":
+        request.scope["path"] = "/"
+    return await call_next(request)
+
 @app.on_event("startup")
 async def startup_event():
     db_manager.initialize()
