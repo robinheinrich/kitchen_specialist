@@ -9,4 +9,4 @@ Data is the same on both ends.
 
 ### Issues and bugs
 - Currently only in German.
-- Receipies are not working atm
+- Recipes are not working atm
