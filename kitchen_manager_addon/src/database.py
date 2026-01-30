@@ -64,6 +64,15 @@ class DatabaseManager:
         setattr(self, list_name, [i for i in target_list if i.get('id') != item_id])
         self.save_data(f"{list_name}.json", getattr(self, list_name))
 
+    def update_item(self, list_name: str, item_id: int, updates: Dict) -> Optional[Dict]:
+        target_list = getattr(self, list_name)
+        for item in target_list:
+            if item.get('id') == item_id:
+                item.update(updates)
+                self.save_data(f"{list_name}.json", target_list)
+                return item
+        return None
+
     def update_settings(self, new_settings: Dict):
         self.settings.update(new_settings)
         self.save_data("settings.json", self.settings)

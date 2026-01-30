@@ -29,6 +29,13 @@ async def get_shopping(request: Request):
 async def add_shopping(item: ItemRequest, request: Request):
     return get_db(request).add_item("shopping_list", item.dict())
 
+@router.put("/shopping/{item_id}")
+async def update_shopping(item_id: int, item: ItemRequest, request: Request):
+    updated = get_db(request).update_item("shopping_list", item_id, item.dict())
+    if not updated:
+        raise HTTPException(404, "Item not found")
+    return updated
+
 @router.delete("/shopping/{item_id}")
 async def delete_shopping(item_id: int, request: Request):
     get_db(request).remove_item("shopping_list", item_id)
@@ -60,6 +67,13 @@ async def get_inventory(request: Request):
 async def add_inventory(item: ItemRequest, request: Request):
     return get_db(request).add_item("inventory", item.dict())
 
+@router.put("/inventory/{item_id}")
+async def update_inventory(item_id: int, item: ItemRequest, request: Request):
+    updated = get_db(request).update_item("inventory", item_id, item.dict())
+    if not updated:
+        raise HTTPException(404, "Item not found")
+    return updated
+
 @router.delete("/inventory/{item_id}")
 async def delete_inventory(item_id: int, request: Request):
     get_db(request).remove_item("inventory", item_id)
@@ -88,6 +102,13 @@ async def get_templates(request: Request):
 @router.post("/templates")
 async def add_template(item: ItemRequest, request: Request):
     return get_db(request).add_item("templates", item.dict())
+
+@router.put("/templates/{item_id}")
+async def update_template(item_id: int, item: ItemRequest, request: Request):
+    updated = get_db(request).update_item("templates", item_id, item.dict())
+    if not updated:
+        raise HTTPException(404, "Item not found")
+    return updated
 
 @router.delete("/templates/{item_id}")
 async def delete_template(item_id: int, request: Request):
@@ -134,8 +155,6 @@ async def cook_recipe(recipe_id: int, request: Request):
             inv_item['amount'] -= ing['amount']
             if inv_item['amount'] <= 0:
                 # Automove to shopping list candidate or just delete?
-                # User requirement: "Can be removed and added to template/shopping"
-                # For now, we leave it at <= 0 and let frontend handle the "Low Stock" alert
                 pass
     
     db.save_data("inventory.json", db.inventory)

@@ -13,6 +13,11 @@ const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })).json(),
+    put: async (endpoint, data) => (await fetch(`${API_BASE}${endpoint}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })).json(),
     delete: async (endpoint) => (await fetch(`${API_BASE}${endpoint}`, { method: 'DELETE' })).json()
 };
 
@@ -30,12 +35,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupNav() {
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const tab = btn.dataset.tab;
-            switchTab(tab);
+            // Find closest button in case icon is clicked
+            const btnEl = e.target.closest('.nav-btn');
+            if (btnEl) {
+                const tab = btnEl.dataset.tab;
+                switchTab(tab);
+            }
         });
     });
-
-    // Initial active state
     updateNavState();
 }
 
@@ -43,6 +50,12 @@ function switchTab(tab) {
     state.currentTab = tab;
     updateNavState();
     render();
+
+    // Manage FAB visibility: Hide in recipes for now if not implemented
+    const fab = document.getElementById('fab');
+    if (fab) {
+        fab.style.display = tab === 'recipes' ? 'none' : 'flex';
+    }
 }
 
 function updateNavState() {
@@ -61,37 +74,56 @@ function setupModal() {
     const cancelBtn = document.getElementById('modal-cancel');
 
     // FAB Logic (Add Button)
-    // Create FAB dynamically if not exists
     let fab = document.getElementById('fab');
     if (!fab) {
         fab = document.createElement('button');
         fab.id = 'fab';
         fab.className = 'fab';
         fab.innerHTML = '<span class="mdi mdi-plus"></span>';
-        document.body.appendChild(fab); // Append to body, not main
-        fab.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            // Force reflow
-            void modal.offsetWidth;
-            modal.classList.add('visible');
-        });
+        document.body.appendChild(fab);
+        fab.addEventListener('click', () => openModal());
     }
 
     cancelBtn.addEventListener('click', closeModal);
 
     saveBtn.addEventListener('click', async () => {
+        const id = document.getElementById('modal-id').value;
         const name = document.getElementById('modal-name').value;
         const amount = document.getElementById('modal-amount').value;
         const unit = document.getElementById('modal-unit').value;
 
         if (name && amount) {
-            await addItem(name, amount, unit);
+            await saveItem(id, name, amount, unit);
             closeModal();
-            // Clear inputs
-            document.getElementById('modal-name').value = '';
-            document.getElementById('modal-amount').value = '';
         }
     });
+}
+
+function openModal(item = null) {
+    const modal = document.getElementById('add-modal');
+    const title = document.getElementById('modal-title');
+    const idInput = document.getElementById('modal-id');
+    const nameInput = document.getElementById('modal-name');
+    const amountInput = document.getElementById('modal-amount');
+    const unitInput = document.getElementById('modal-unit');
+
+    if (item) {
+        title.textContent = 'Item bearbeiten';
+        idInput.value = item.id;
+        nameInput.value = item.name;
+        amountInput.value = item.amount;
+        unitInput.value = item.unit;
+    } else {
+        title.textContent = 'Neues Item';
+        idInput.value = '';
+        nameInput.value = '';
+        amountInput.value = '';
+        unitInput.value = 'st'; // Default
+    }
+
+    modal.classList.remove('hidden');
+    void modal.offsetWidth;
+    modal.classList.add('visible');
 }
 
 function closeModal() {
@@ -116,7 +148,7 @@ async function render() {
 
     try {
         data = await api.get(endpoint);
-        main.innerHTML = ''; // Clear loading
+        main.innerHTML = '';
 
         if (data.length === 0) {
             main.innerHTML = '<div style="text-align: center; color: #999; margin-top: 50px;">Keine Einträge</div>';
@@ -126,6 +158,7 @@ async function render() {
         if (state.currentTab === 'recipes') {
             renderRecipes(data, main);
         } else {
+            state.items = data; // Cache for edit
             renderList(data, main);
         }
 
@@ -147,6 +180,12 @@ function renderList(items, container) {
 
         const actions = clone.querySelector('.item-actions');
 
+        // Edit Button
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '<span class="mdi mdi-pencil-outline"></span>';
+        editBtn.onclick = () => openModal(item);
+        actions.appendChild(editBtn);
+
         // Delete Button
         const delBtn = document.createElement('button');
         delBtn.className = 'btn-delete';
@@ -158,19 +197,19 @@ function renderList(items, container) {
         if (state.currentTab === 'shopping') {
             const moveBtn = document.createElement('button');
             moveBtn.className = 'btn-move';
-            moveBtn.innerHTML = '<span class="mdi mdi-fridge-outline"></span>'; // Move to fridge
-            moveBtn.onclick = () => moveItem(item.id, '/move'); // /shopping/{id}/move -> to inventory
+            moveBtn.innerHTML = '<span class="mdi mdi-fridge-outline"></span>';
+            moveBtn.onclick = () => moveItem(item.id, '/move');
             actions.appendChild(moveBtn);
         } else if (state.currentTab === 'inventory') {
             const moveBtn = document.createElement('button');
             moveBtn.className = 'btn-move';
-            moveBtn.innerHTML = '<span class="mdi mdi-cart-outline"></span>'; // Move to shopping
-            moveBtn.onclick = () => moveItem(item.id, '/move'); // /inventory/{id}/move -> to shopping
+            moveBtn.innerHTML = '<span class="mdi mdi-cart-outline"></span>';
+            moveBtn.onclick = () => moveItem(item.id, '/move');
             actions.appendChild(moveBtn);
         } else if (state.currentTab === 'templates') {
             const useBtn = document.createElement('button');
             useBtn.className = 'btn-move';
-            useBtn.innerHTML = '<span class="mdi mdi-plus-circle-outline"></span>'; // Add to shopping list
+            useBtn.innerHTML = '<span class="mdi mdi-plus-circle-outline"></span>';
             useBtn.onclick = () => useTemplate(item.id);
             actions.appendChild(useBtn);
         }
@@ -197,26 +236,32 @@ function renderRecipes(recipes, container) {
                  </button>
             </div>
         `;
-
-        // Need to attach event listener properly for function reference to work
-        const btn = card.querySelector('.btn-move');
-        btn.onclick = () => cookRecipe(recipe.id);
+        // Attach click handler for cook button since innerHTML string breaks onclick scope
+        card.querySelector('.btn-move').onclick = () => cookRecipe(recipe.id);
 
         container.appendChild(card);
     });
 }
 
 // --- Actions ---
-async function addItem(name, amount, unit) {
+async function saveItem(id, name, amount, unit) {
     let endpoint = '';
     switch (state.currentTab) {
         case 'shopping': endpoint = '/shopping'; break;
         case 'inventory': endpoint = '/inventory'; break;
         case 'templates': endpoint = '/templates'; break;
-        case 'recipes': alert('Rezepte hinzufügen noch nicht implementiert'); return;
+        case 'recipes': return;
     }
 
-    await api.post(endpoint, { name, amount: parseFloat(amount), unit });
+    const payload = { name, amount: parseFloat(amount), unit };
+
+    if (id) {
+        // Update
+        await api.put(`${endpoint}/${id}`, payload);
+    } else {
+        // Create
+        await api.post(endpoint, payload);
+    }
     render();
 }
 
@@ -227,6 +272,8 @@ async function deleteItem(id) {
         case 'inventory': endpoint = `/inventory/${id}`; break;
         case 'templates': endpoint = `/templates/${id}`; break;
     }
+    // No confirm for quicker action, or maybe soft confirm? User asked for edit, not delete workflow change.
+    // Keeping confirm from before to be safe.
     if (confirm('Wirklich löschen?')) {
         await api.delete(endpoint);
         render();

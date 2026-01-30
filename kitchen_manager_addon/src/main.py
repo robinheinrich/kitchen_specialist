@@ -1,12 +1,17 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import os
+import logging
 
 from .database import DatabaseManager
 from .api import router as api_router
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+_LOGGER = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -35,3 +40,12 @@ async def read_root(request: Request):
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+    
+# Debug: Catch-all to see what path is being requested if 404
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc):
+    _LOGGER.error(f"404 Error for path: {request.url.path}")
+    return JSONResponse(
+        status_code=404,
+        content={"detail": f"Not Found: {request.url.path}"},
+    )
