@@ -1,7 +1,7 @@
-#!/command/with-contenv bashio
+#!/bin/bash
 
-# S6-RC Service Run Script
-echo "Starting Kitchen Manager (Modern v0.0.1)..."
+# Simple bash run script - avoids s6-overlay-suexec PID 1 check
+echo "Starting Kitchen Manager (Simple Bash)..."
 
 export DATA_PATH="/data"
 
