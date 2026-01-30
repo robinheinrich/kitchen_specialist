@@ -68,37 +68,6 @@ function updateNavState() {
     });
 }
 
-function setupModal() {
-    const modal = document.getElementById('add-modal');
-    const saveBtn = document.getElementById('modal-save');
-    const cancelBtn = document.getElementById('modal-cancel');
-
-    // FAB Logic (Add Button)
-    let fab = document.getElementById('fab');
-    if (!fab) {
-        fab = document.createElement('button');
-        fab.id = 'fab';
-        fab.className = 'fab';
-        fab.innerHTML = '<span class="mdi mdi-plus"></span>';
-        document.body.appendChild(fab);
-        fab.addEventListener('click', () => openModal());
-    }
-
-    cancelBtn.addEventListener('click', closeModal);
-
-    saveBtn.addEventListener('click', async () => {
-        const id = document.getElementById('modal-id').value;
-        const name = document.getElementById('modal-name').value;
-        const amount = document.getElementById('modal-amount').value;
-        const unit = document.getElementById('modal-unit').value;
-
-        if (name && amount) {
-            await saveItem(id, name, amount, unit);
-            closeModal();
-        }
-    });
-}
-
 function openModal(item = null) {
     const modal = document.getElementById('add-modal');
     const title = document.getElementById('modal-title');
@@ -126,10 +95,68 @@ function openModal(item = null) {
     modal.classList.add('visible');
 }
 
-function closeModal() {
-    const modal = document.getElementById('add-modal');
+function closeModal(modalId = 'add-modal') {
+    const modal = document.getElementById(modalId);
     modal.classList.remove('visible');
     setTimeout(() => modal.classList.add('hidden'), 300);
+}
+
+function setupModal() {
+    // Add Item Modal
+    const addModal = document.getElementById('add-modal');
+    const saveBtn = document.getElementById('modal-save');
+    const cancelBtn = document.getElementById('modal-cancel');
+
+    // Settings Modal
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const settingsSave = document.getElementById('settings-save');
+    const settingsCancel = document.getElementById('settings-cancel');
+
+    // FAB Logic
+    let fab = document.getElementById('fab');
+    if (!fab) {
+        fab = document.createElement('button');
+        fab.id = 'fab';
+        fab.className = 'fab';
+        fab.innerHTML = '<span class="mdi mdi-plus"></span>';
+        document.body.appendChild(fab);
+        fab.addEventListener('click', () => openModal());
+    }
+
+    // Bind Add/Edit Modal
+    cancelBtn.addEventListener('click', () => closeModal('add-modal'));
+    saveBtn.addEventListener('click', async () => {
+        const id = document.getElementById('modal-id').value;
+        const name = document.getElementById('modal-name').value;
+        const amount = document.getElementById('modal-amount').value;
+        const unit = document.getElementById('modal-unit').value;
+
+        if (name && amount) {
+            await saveItem(id, name, amount, unit);
+            closeModal('add-modal');
+        }
+    });
+
+    // Bind Settings Modal
+    settingsBtn.addEventListener('click', async () => {
+        // Load current settings
+        const settings = await api.get('/settings');
+        document.getElementById('default-tab-select').value = settings.default_tab || 'shopping';
+
+        settingsModal.classList.remove('hidden');
+        void settingsModal.offsetWidth;
+        settingsModal.classList.add('visible');
+    });
+
+    settingsCancel.addEventListener('click', () => closeModal('settings-modal'));
+
+    settingsSave.addEventListener('click', async () => {
+        const defaultTab = document.getElementById('default-tab-select').value;
+        await api.post('/settings', { default_tab: defaultTab });
+        closeModal('settings-modal');
+        alert('Einstellungen gespeichert');
+    });
 }
 
 async function render() {
