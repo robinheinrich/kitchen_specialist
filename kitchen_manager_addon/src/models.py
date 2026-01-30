@@ -5,12 +5,12 @@ class Product(BaseModel):
     id: Optional[int] = None
     name: str
     amount: float
-    unit: Literal["st", "g", "kg", "l", "ml", "Kiste"]
+    unit: Literal["st", "g", "kg", "l", "ml", "Kiste", "Tüte", "Glas", "Dose"]
     
 class RecipeIngredient(BaseModel):
     name: str
     amount: float
-    unit: Literal["st", "g", "kg", "l", "ml", "Kiste"]
+    unit: Literal["st", "g", "kg", "l", "ml", "Kiste", "Tüte", "Glas", "Dose"]
 
 class Recipe(BaseModel):
     id: Optional[int] = None
