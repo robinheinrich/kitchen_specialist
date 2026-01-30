@@ -42,7 +42,10 @@ app.include_router(api_router, prefix="/api")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    ingress_path = request.headers.get("X-Ingress-Path", "")
+    root_path = f"{ingress_path.rstrip('/')}/" if ingress_path else "/"
+    _LOGGER.info(f"Serving root with Ingress Path: {ingress_path}, Base: {root_path}")
+    return templates.TemplateResponse("index.html", {"request": request, "root_path": root_path})
 
 @app.get("/health")
 async def health_check():
