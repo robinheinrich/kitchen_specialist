@@ -1,0 +1,240 @@
+:root {
+    --primary-color: #88B04B; /* Matcha Green */
+    --primary-dark: #6A8E3C;
+    --secondary-color: #F7F7F7; /* Off-White */
+    --accent-color: #FF6F61; /* Living Coral - soft alert */
+    --text-color: #333333;
+    --text-light: #777777;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --radius: 16px;
+    --font-main: 'Outfit', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    margin: 0;
+    min-height: 100vh;
+}
+
+.app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 80px; /* Space for nav */
+}
+
+/* Header */
+.glass-header {
+    position: sticky;
+    top: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 100;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.highlight {
+    color: var(--primary-color);
+}
+
+/* Nav */
+.glass-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px;
+    z-index: 100;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-main);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.nav-btn.active {
+    color: var(--primary-color);
+}
+
+.nav-btn .mdi {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+/* items */
+.card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-info {
+    flex-grow: 1;
+}
+
+.item-name {
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.item-amount {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.item-actions button {
+    background: #f0f0f0;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-left: 8px;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background 0.2s;
+}
+
+.item-actions button:hover {
+    background: #e0e0e0;
+}
+
+.btn-delete {
+    color: var(--accent-color) !important;
+}
+
+.btn-move {
+    color: var(--primary-color) !important;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: var(--radius);
+    width: 80%;
+    max-width: 400px;
+}
+
+.hidden { display: none; }
+
+/* FAB */
+.fab {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(136, 176, 75, 0.4);
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    transition: transform 0.2s;
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: var(--font-main);
+    font-size: 1rem;
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-main);
+}
+
+.btn.primary {
+    background: var(--primary-color);
+    color: white;
+    flex: 1;
+}
+
+.btn.secondary {
+    background: #f0f0f0;
+    color: #666;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.item-card {
+    animation: slideIn 0.3s ease-out;
+}

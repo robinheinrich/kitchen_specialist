@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="glass-header">
+            <h1>Kitchen<span class="highlight">Manager</span></h1>
+            <button id="settings-btn" class="icon-btn"><span class="mdi mdi-cog"></span></button>
+        </header>
+
+        <main id="main-content">
+            <!-- Dynamic Content -->
+        </main>
+
+        <nav class="glass-nav">
+            <button class="nav-btn active" data-tab="shopping">
+                <span class="mdi mdi-cart-outline"></span>
+                <span>Einkauf</span>
+            </button>
+            <button class="nav-btn" data-tab="inventory">
+                <span class="mdi mdi-fridge-outline"></span>
+                <span>Bestand</span>
+            </button>
+            <button class="nav-btn" data-tab="recipes">
+                <span class="mdi mdi-chef-hat"></span>
+                <span>Rezepte</span>
+            </button>
+            <button class="nav-btn" data-tab="templates">
+                <span class="mdi mdi-notebook-outline"></span>
+                <span>Vorlagen</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Templates for JS rendering -->
+    <template id="list-item-template">
+        <div class="card item-card" data-id="">
+            <div class="item-info">
+                <div class="item-name"></div>
+                <div class="item-amount"></div>
+            </div>
+            <div class="item-actions">
+                <!-- Actions injected via JS -->
+            </div>
+        </div>
+    </template>
+
+    <div id="add-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <h2 id="modal-title">Neues Item</h2>
+            <input type="text" id="modal-name" placeholder="Name">
+            <div class="row">
+                <input type="number" id="modal-amount" placeholder="Menge" step="0.1">
+                <select id="modal-unit">
+                    <option value="st">Stk</option>
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="l">L</option>
+                    <option value="ml">ml</option>
+                </select>
+            </div>
+            <div class="row actions">
+                <button class="btn secondary" id="modal-cancel">Abbrechen</button>
+                <button class="btn primary" id="modal-save">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js" type="module"></script>
+</body>
+
+</html>

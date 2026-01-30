@@ -1,0 +1,9 @@
+#!/command/with-contenv bashio
+
+# S6-RC Service Run Script
+echo "Starting Kitchen Manager (Modern v0.0.1)..."
+
+export DATA_PATH="/data"
+
+cd /app
+exec python3 -m uvicorn src.main:app --host 0.0.0.0 --port 8000
