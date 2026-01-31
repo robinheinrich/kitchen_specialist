@@ -134,9 +134,8 @@ function setupModal() {
 
         // Wenn amount = 0, dann von Bestand löschen und auf Vorlagen setzen
         if (name && amount) {
-            if (amount == 0) {
-
-                await deleteItem(id);
+            if (amount <= 0) {
+                await moveItem(id, 'templates');
             } else {
                 await saveItem(id, name, amount, unit);
             }
