@@ -302,7 +302,6 @@ async function saveItem(id, name, amount, unit) {
 
     if (amount <= 0) {
         await moveItem(id, 'templates');
-        render();
         return;
     }
 
