@@ -245,13 +245,13 @@ function renderList(items, container) {
             const moveBtn = document.createElement('button');
             moveBtn.className = 'btn-move';
             moveBtn.innerHTML = '<span class="mdi mdi-fridge-outline"></span>';
-            moveBtn.onclick = () => moveItem(item.id, 'inventory');
+            moveBtn.onclick = () => moveItem(item.id, '/inventory');
             actions.appendChild(moveBtn);
         } else if (state.currentTab === 'inventory') {
             const moveBtn = document.createElement('button');
             moveBtn.className = 'btn-move';
             moveBtn.innerHTML = '<span class="mdi mdi-cart-outline"></span>';
-            moveBtn.onclick = () => moveItem(item.id, 'shopping');
+            moveBtn.onclick = () => moveItem(item.id, '/shopping');
             actions.appendChild(moveBtn);
         } else if (state.currentTab === 'templates') {
             const useBtn = document.createElement('button');
