@@ -132,8 +132,14 @@ function setupModal() {
         const amount = document.getElementById('modal-amount').value;
         const unit = document.getElementById('modal-unit').value;
 
+        // Wenn amount = 0, dann von Bestand löschen und auf Vorlagen setzen
         if (name && amount) {
-            await saveItem(id, name, amount, unit);
+            if (amount == 0) {
+
+                await deleteItem(id);
+            } else {
+                await saveItem(id, name, amount, unit);
+            }
             closeModal('add-modal');
         }
     });
@@ -239,13 +245,13 @@ function renderList(items, container) {
             const moveBtn = document.createElement('button');
             moveBtn.className = 'btn-move';
             moveBtn.innerHTML = '<span class="mdi mdi-fridge-outline"></span>';
-            moveBtn.onclick = () => moveItem(item.id, '/move');
+            moveBtn.onclick = () => moveItem(item.id, '/inventory');
             actions.appendChild(moveBtn);
         } else if (state.currentTab === 'inventory') {
             const moveBtn = document.createElement('button');
             moveBtn.className = 'btn-move';
             moveBtn.innerHTML = '<span class="mdi mdi-cart-outline"></span>';
-            moveBtn.onclick = () => moveItem(item.id, '/move');
+            moveBtn.onclick = () => moveItem(item.id, '/shopping');
             actions.appendChild(moveBtn);
         } else if (state.currentTab === 'templates') {
             const useBtn = document.createElement('button');
@@ -294,6 +300,11 @@ async function saveItem(id, name, amount, unit) {
         case 'recipes': return;
     }
 
+    if (amount <= 0) {
+        await moveItem(id, 'templates');
+        return;
+    }
+
     const payload = { name, amount: parseFloat(amount), unit };
 
     if (id) {
@@ -321,9 +332,15 @@ async function deleteItem(id) {
     }
 }
 
-async function moveItem(id, actionPath) {
-    let base = state.currentTab === 'shopping' ? '/shopping' : '/inventory';
-    await api.post(`${base}/${id}${actionPath}`, {});
+async function moveItem(id, target) {
+    let source = '';
+    switch (state.currentTab) {
+        case 'shopping': source = '/shopping'; break;
+        case 'inventory': source = '/inventory'; break;
+        case 'templates': source = '/templates'; break;
+    }
+
+    await api.post(`${source}/${id}/move/${target}`, {});
     render();
 }
 
