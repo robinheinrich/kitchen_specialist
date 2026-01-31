@@ -64,6 +64,26 @@ class DatabaseManager:
         setattr(self, list_name, [i for i in target_list if i.get('id') != item_id])
         self.save_data(f"{list_name}.json", getattr(self, list_name))
 
+    def move_item(self, source_list: str, target_list: str, item_id: int):
+        source = getattr(self, source_list)
+        target = getattr(self, target_list)
+
+        item = next((i for i in source if i["id"] == item_id), None)
+        if not item:
+            return {"error": "Item not found"}
+
+        # Entfernen aus Quelle
+        setattr(self, source_list, [i for i in source if i["id"] != item_id])
+
+        # Hinzufügen zu Ziel
+        target.append(item)
+
+        # Speichern
+        self.save_data(f"{source_list}.json", getattr(self, source_list))
+        self.save_data(f"{target_list}.json", target)
+
+        return item
+
     def update_item(self, list_name: str, item_id: int, updates: Dict) -> Optional[Dict]:
         target_list = getattr(self, list_name)
         for item in target_list:

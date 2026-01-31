@@ -41,22 +41,20 @@ async def delete_shopping(item_id: int, request: Request):
     get_db(request).remove_item("shopping_list", item_id)
     return {"status": "ok"}
 
-@router.post("/shopping/{item_id}/move")
-async def move_to_inventory(item_id: int, request: Request):
+@router.post("/{source}/{item_id}/move/{target}")
+async def move_item(source: str, item_id: int, target: str, request: Request):
     db = get_db(request)
-    item = next((i for i in db.shopping_list if i['id'] == item_id), None)
-    if not item:
-        raise HTTPException(404, "Item not found")
-    
-    # Add to inventory
-    db.add_item("inventory", {
-        "name": item['name'],
-        "amount": item['amount'],
-        "unit": item['unit']
-    })
-    # Remove from shopping
-    db.remove_item("shopping_list", item_id)
-    return {"status": "ok"}
+
+    mapping = {
+        "shopping": "shopping_list",
+        "inventory": "inventory",
+        "templates": "templates"
+    }
+
+    if source not in mapping or target not in mapping:
+        raise HTTPException(400, "Invalid list name")
+
+    return db.move_item(mapping[source], mapping[target], item_id)
 
 # --- Inventory ---
 @router.get("/inventory")
@@ -77,21 +75,6 @@ async def update_inventory(item_id: int, item: ItemRequest, request: Request):
 @router.delete("/inventory/{item_id}")
 async def delete_inventory(item_id: int, request: Request):
     get_db(request).remove_item("inventory", item_id)
-    return {"status": "ok"}
-
-@router.post("/inventory/{item_id}/move")
-async def move_to_shopping(item_id: int, request: Request):
-    db = get_db(request)
-    item = next((i for i in db.inventory if i['id'] == item_id), None)
-    if not item:
-        raise HTTPException(404, "Item not found")
-    
-    db.add_item("shopping_list", {
-        "name": item['name'],
-        "amount": item['amount'],
-        "unit": item['unit']
-    })
-    db.remove_item("inventory", item_id)
     return {"status": "ok"}
 
 # --- Templates ---
