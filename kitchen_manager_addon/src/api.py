@@ -27,11 +27,11 @@ async def get_shopping(request: Request):
 
 @router.post("/shopping")
 async def add_shopping(item: ItemRequest, request: Request):
-    return get_db(request).add_item("shopping_list", item.dict())
+    return get_db(request).add_item("shopping_list", item.model_dump(mode='json'))
 
 @router.put("/shopping/{item_id}")
 async def update_shopping(item_id: int, item: ItemRequest, request: Request):
-    updated = get_db(request).update_item("shopping_list", item_id, item.dict())
+    updated = get_db(request).update_item("shopping_list", item_id, item.model_dump(mode='json'))
     if not updated:
         raise HTTPException(404, "Item not found")
     return updated
@@ -63,11 +63,11 @@ async def get_inventory(request: Request):
 
 @router.post("/inventory")
 async def add_inventory(item: ItemRequest, request: Request):
-    return get_db(request).add_item("inventory", item.dict())
+    return get_db(request).add_item("inventory", item.model_dump(mode='json'))
 
 @router.put("/inventory/{item_id}")
 async def update_inventory(item_id: int, item: ItemRequest, request: Request):
-    updated = get_db(request).update_item("inventory", item_id, item.dict())
+    updated = get_db(request).update_item("inventory", item_id, item.model_dump(mode='json'))
     if not updated:
         raise HTTPException(404, "Item not found")
     return updated
@@ -84,11 +84,11 @@ async def get_templates(request: Request):
 
 @router.post("/templates")
 async def add_template(item: ItemRequest, request: Request):
-    return get_db(request).add_item("templates", item.dict())
+    return get_db(request).add_item("templates", item.model_dump(mode='json'))
 
 @router.put("/templates/{item_id}")
 async def update_template(item_id: int, item: ItemRequest, request: Request):
-    updated = get_db(request).update_item("templates", item_id, item.dict())
+    updated = get_db(request).update_item("templates", item_id, item.model_dump(mode='json'))
     if not updated:
         raise HTTPException(404, "Item not found")
     return updated
